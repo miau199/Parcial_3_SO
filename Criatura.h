@@ -1,33 +1,34 @@
-#ifndef Criatura_H
-#define Criatura_H
+#ifndef CRIATURA_H
+#define CRIATURA_H
 
-#include <SFML/Graphics.hpp>
+#include <string>
+#include <vector>
 #include <thread>
 #include <mutex>
 #include <iostream>
+#include <cstdlib>
 #include <chrono>
-#include <random>
 
 class Criatura {
 public:
-    Criatura(int id, float x, float y, sf::Color color);
-    void iniciar();
-    void movimiento();
-    void follow(Criatura* objetivo);
-    void movimientoAleatorio();
-    float getX() const;
-    float getY() const;
-    sf::CircleShape getForma() const;
+    Criatura(int id, std::string especie, int x, int y, int tipo);
+    void mover(std::vector<Criatura*>& criaturas1, std::vector<Criatura*>& criaturas2, std::vector<Criatura*>& criaturas3, std::mutex& mtx);
+    void seguir(Criatura* objetivo);
+    void detener();
+    void matar();
+    int getX() const { return x; }
+    int getY() const { return y; }
+    int getTipo() const { return tipo; }
 
 private:
     int id;
-    float x, y; // Posición
+    std::string especie;
+    int x, y;
     bool vivo;
-    std::mutex mtx; // Mutex para la seguridad en los hilos
-    sf::CircleShape forma;
-private:
-    float velocidad; // Velocidad de la criatura
-    float areaDeProximidad; // Distancia dentro de la cual la criatura seguirá a otra
+    int hambre;
+    int velocidad;
+    int tipo; // Tipo de criatura
+    std::thread hilo; // Hilo para el movimiento
 };
 
-#endif // Criatura_H
+#endif // CRIATURA_H
