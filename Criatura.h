@@ -33,7 +33,9 @@ public:
     int getVelocidadActual() const { return velocidadActual; }
     void huir();
     bool estaSiendoPerseguida(const std::vector<Criatura*>& depredadores);
-
+    void iniciarHuida();
+    bool debeTerminarHuida();
+    
 
 private:
     int id;
@@ -55,9 +57,10 @@ private:
     std::chrono::steady_clock::time_point ultimaActualizacionHambre;
     static const int HAMBRE_MAXIMA = 100;
     static const int TIEMPO_HAMBRE_MAXIMA = 60; // 60 segundos
-    float centroBiomaX;
-    float centroBiomaY;
     bool estaEnBordeBioma(int x, int y) const;
+    bool huyendo;
+    std::chrono::steady_clock::time_point tiempoInicioHuida;
+    const std::chrono::seconds DURACION_HUIDA{2}; // 2 segundos
 };
 
 #endif // CRIATURA_H

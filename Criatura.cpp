@@ -5,7 +5,7 @@ const float DISTANCIA_DETECCION = 100.0f; //100 pixeles o menos de distancia
 Criatura::Criatura(int id, std::string especie, int x, int y, int tipo)
     : id(id), especie(especie), x(x), y(y), vivo(true), hambre(0), 
       velocidadBase(25), velocidadActual(velocidadBase), tipo(tipo),
-      direccionX(0), direccionY(0), tiempoDireccion(0) {
+      direccionX(0), direccionY(0), tiempoDireccion(0), huyendo(false) {
     actualizarDireccionAleatoria();
     ultimaActualizacionHambre = std::chrono::steady_clock::now();
 }
@@ -33,8 +33,23 @@ void Criatura::mover(std::vector<Criatura*>& criaturas1, std::vector<Criatura*>&
 
         int newX, newY;
         if (estaSiendoPerseguida(depredadores)) {
-            huir();
-        } else {
+            iniciarHuida();
+        }
+
+         if (estaSiendoPerseguida(depredadores)) {
+            iniciarHuida();
+        }
+
+        if (huyendo) {
+            if (debeTerminarHuida()) {
+                huyendo = false;
+            } else {
+                huir();
+                continue;
+            }
+        }
+         
+        else {
             Criatura* objetivoMasCercano = buscarObjetivoMasCercano(criaturasObjetivo);
             if (objetivoMasCercano && !estaEnBordeBioma(x, y)) {
                 newX = x + (objetivoMasCercano->x > x ? 1 : (objetivoMasCercano->x < x ? -1 : 0));
@@ -157,29 +172,15 @@ No se aplica el límite máximo, ya que 37 no es mayor que 50*/
 
 // Huye a un punto especifico
 void Criatura::huir() {
-    int margen = 30;
-    int newX, newY;
+    if (!bioma) return;
 
-    switch(tipo) {
-        case 1: // Esquina superior izquierda
-            newX = margen;
-            newY = margen;
-            break;
-        case 2: // Esquina superior derecha
-            newX = screenWidth - margen;
-            newY = margen;
-            break;
-        case 3: // Esquina inferior derecha
-            newX = margen;
-            newY = screenHeight - margen;
-            break;
-        default:
-            return; 
-    }
+    sf::Vector2f puntoSeguro = bioma->getPuntoSeguro();
+    float newX = puntoSeguro.x;
+    float newY = puntoSeguro.y;
 
-    // Calcula la dirección hacia la esquina
-    int dx = newX - x;
-    int dy = newY - y;
+    // Calcula la dirección hacia el punto seguro
+    float dx = newX - x;
+    float dy = newY - y;
     float distancia = std::sqrt(dx*dx + dy*dy);
     
     if (distancia > 0) {
@@ -189,7 +190,17 @@ void Criatura::huir() {
     }
 }
 
+void Criatura::iniciarHuida() {
+    if (!huyendo) {
+        huyendo = true;
+        tiempoInicioHuida = std::chrono::steady_clock::now();
+    }
+}
 
+bool Criatura::debeTerminarHuida() {
+    auto ahora = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::seconds>(ahora - tiempoInicioHuida) >= DURACION_HUIDA;
+}
 
 
 

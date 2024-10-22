@@ -23,10 +23,28 @@ int main() {
     std::vector<Criatura*> criaturas3; // Tipo 3
     std::mutex mtx;
 
+    sf::Texture backgroundTexture;
+    if (!backgroundTexture.loadFromFile("./imagenes/mapaSO.png")) {
+        std::cout << "Error cargando la imagen de fondo" << std::endl;
+        return -1;
+    }
+
+    sf::Sprite backgroundSprite(backgroundTexture);
+
+    // Obtener el tamaño original de la textura
+    sf::Vector2u textureSize = backgroundTexture.getSize();
+
+    // Calcula la escala necesaria para ajustar la imagen a la ventana
+    float scaleX = static_cast<float>(WINDOW_WIDTH) / textureSize.x;
+    float scaleY = static_cast<float>(WINDOW_HEIGHT) / textureSize.y;
+
+    // Aplica la escala al sprite
+    backgroundSprite.setScale(scaleX, scaleY);
+
 // Crear criaturas
 for (int i = 0; i < numCriaturasPorTipo; ++i) {
     criaturas1.push_back(new Criatura(i + 1, "Especie 1", 350, 350, 1));
-    criaturas2.push_back(new Criatura(i + 1, "Especie 2", 700, 600, 2));
+    criaturas2.push_back(new Criatura(i + 1, "Especie 2", 700, 300, 2));
     criaturas3.push_back(new Criatura(i + 1, "Especie 3", 500, 800, 3));
 }
 
@@ -34,39 +52,39 @@ for (int i = 0; i < numCriaturasPorTipo; ++i) {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Simulador de Ecosistema");
 
     // Crear formas para los bordes
-    sf::RectangleShape bordeAzul(sf::Vector2f(650, 650));
-    bordeAzul.setFillColor(sf::Color::Transparent);
-    bordeAzul.setOutlineThickness(2);
-    bordeAzul.setOutlineColor(sf::Color::Blue);
-    bordeAzul.setPosition(0, 0);
-
-    sf::RectangleShape bordeVerde(sf::Vector2f(600, 800));
+    sf::RectangleShape bordeVerde(sf::Vector2f(600, 600));
     bordeVerde.setFillColor(sf::Color::Transparent);
     bordeVerde.setOutlineThickness(2);
     bordeVerde.setOutlineColor(sf::Color::Green);
-    bordeVerde.setPosition(WINDOW_WIDTH - 600, 0);
+    bordeVerde.setPosition(0, 0);
 
-    sf::RectangleShape bordeAmarillo(sf::Vector2f(800, 450));
+    sf::RectangleShape bordeAmarillo(sf::Vector2f(600, 600));
     bordeAmarillo.setFillColor(sf::Color::Transparent);
     bordeAmarillo.setOutlineThickness(2);
     bordeAmarillo.setOutlineColor(sf::Color::Yellow);
-    bordeAmarillo.setPosition(0, WINDOW_HEIGHT - 450);
+    bordeAmarillo.setPosition(WINDOW_WIDTH - 600, 0);
+
+    sf::RectangleShape bordeAzul(sf::Vector2f(WINDOW_WIDTH, 500));
+    bordeAzul.setFillColor(sf::Color::Transparent);
+    bordeAzul.setOutlineThickness(2);
+    bordeAzul.setOutlineColor(sf::Color::Blue);
+    bordeAzul.setPosition(0, WINDOW_HEIGHT - 500);
 
     // Crear biomas (y sus límites)
-    Bioma biomaAzul(0, 0, 650, 650);
-    Bioma biomaVerde(WINDOW_WIDTH - 600, 0, 600, 800);
-    Bioma biomaAmarillo(0, WINDOW_HEIGHT - 450, 800, 450);
+    Bioma biomaVerde(0, 0, 600, 600, 100, 100);
+    Bioma biomaAmarillo(WINDOW_WIDTH - 600, 0, 600, 600, 900, 120);
+    Bioma biomaAzul(0, WINDOW_HEIGHT - 500, WINDOW_WIDTH, 500, 500, 800);
 
 
     // Asignar biomas a las criaturas
     for (auto& criatura : criaturas1) {
-        criatura->setBioma(&biomaAzul, WINDOW_WIDTH, WINDOW_HEIGHT);
-    }
-    for (auto& criatura : criaturas2) {
         criatura->setBioma(&biomaVerde, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
-    for (auto& criatura : criaturas3) {
+    for (auto& criatura : criaturas2) {
         criatura->setBioma(&biomaAmarillo, WINDOW_WIDTH, WINDOW_HEIGHT);
+    }
+    for (auto& criatura : criaturas3) {
+        criatura->setBioma(&biomaAzul, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
 
@@ -92,6 +110,9 @@ for (int i = 0; i < numCriaturasPorTipo; ++i) {
         // Limpiar la ventana
         window.clear(sf::Color::White);
 
+        // Dibuja el fondo primero
+        window.draw(backgroundSprite);
+
         // Dibujar los bordes
         window.draw(bordeAzul);
         window.draw(bordeVerde);
@@ -100,19 +121,19 @@ for (int i = 0; i < numCriaturasPorTipo; ++i) {
         // Dibujar criaturas
         for (const auto& criatura : criaturas1) {
             sf::CircleShape shape(10); // Tamaño del círculo
-            shape.setFillColor(sf::Color::Blue); // Color de la criatura (azul para tipo 1)
+            shape.setFillColor(sf::Color::Green); // Color de la criatura (azul para tipo 1)
             shape.setPosition(criatura->getX(), criatura->getY()); // Posición de la criatura
             window.draw(shape);
         }
         for (const auto& criatura : criaturas2) {
             sf::CircleShape shape(10); // Tamaño del círculo
-            shape.setFillColor(sf::Color::Green); // Color de la criatura (verde para tipo 2)
+            shape.setFillColor(sf::Color::Red); // Color de la criatura (verde para tipo 2)
             shape.setPosition(criatura->getX(), criatura->getY()); // Posición de la criatura
             window.draw(shape);
         }
         for (const auto& criatura : criaturas3) {
             sf::CircleShape shape(10); // Tamaño del círculo
-            shape.setFillColor(sf::Color::Yellow); // Color de la criatura (amarillo para tipo 3)
+            shape.setFillColor(sf::Color::Blue); // Color de la criatura (amarillo para tipo 3)
             shape.setPosition(criatura->getX(), criatura->getY()); // Posición de la criatura
             window.draw(shape);
         }
