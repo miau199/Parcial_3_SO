@@ -23,21 +23,10 @@ int main() {
     std::vector<Criatura*> criaturas3; // Tipo 3
     std::mutex mtx;
 
-// Definir un margen para que las criaturas no aparezcan justo en el borde
-const int MARGIN = 20;
-
 // Crear criaturas
 for (int i = 0; i < numCriaturasPorTipo; ++i) {
-    int x = MARGIN + rand() % (WINDOW_WIDTH - 2 * MARGIN);
-    int y = MARGIN + rand() % (WINDOW_HEIGHT - 2 * MARGIN);
     criaturas1.push_back(new Criatura(i + 1, "Especie 1", 350, 350, 1));
-    
-    x = MARGIN + rand() % (WINDOW_WIDTH - 2 * MARGIN);
-    y = MARGIN + rand() % (WINDOW_HEIGHT - 2 * MARGIN);
-    criaturas2.push_back(new Criatura(i + 1, "Especie 2", 700, 100, 2));
-    
-    x = MARGIN + rand() % (WINDOW_WIDTH - 2 * MARGIN);
-    y = MARGIN + rand() % (WINDOW_HEIGHT - 2 * MARGIN);
+    criaturas2.push_back(new Criatura(i + 1, "Especie 2", 700, 600, 2));
     criaturas3.push_back(new Criatura(i + 1, "Especie 3", 500, 800, 3));
 }
 
@@ -57,16 +46,16 @@ for (int i = 0; i < numCriaturasPorTipo; ++i) {
     bordeVerde.setOutlineColor(sf::Color::Green);
     bordeVerde.setPosition(WINDOW_WIDTH - 600, 0);
 
-    sf::RectangleShape bordeAmarillo(sf::Vector2f(800, 350));
+    sf::RectangleShape bordeAmarillo(sf::Vector2f(800, 450));
     bordeAmarillo.setFillColor(sf::Color::Transparent);
     bordeAmarillo.setOutlineThickness(2);
     bordeAmarillo.setOutlineColor(sf::Color::Yellow);
-    bordeAmarillo.setPosition(0, WINDOW_HEIGHT - 350);
+    bordeAmarillo.setPosition(0, WINDOW_HEIGHT - 450);
 
     // Crear biomas (y sus límites)
     Bioma biomaAzul(0, 0, 650, 650);
     Bioma biomaVerde(WINDOW_WIDTH - 600, 0, 600, 800);
-    Bioma biomaAmarillo(0, WINDOW_HEIGHT - 350, 800, 350);
+    Bioma biomaAmarillo(0, WINDOW_HEIGHT - 450, 800, 450);
 
 
     // Asignar biomas a las criaturas

@@ -17,7 +17,6 @@ class Criatura {
 public:
     Criatura(int id, std::string especie, int x, int y, int tipo);
     void mover(std::vector<Criatura*>& criaturas1, std::vector<Criatura*>& criaturas2, std::vector<Criatura*>& criaturas3, std::mutex& mtx);
-    void seguir(Criatura* objetivo);
     void detener();
     void matar();
     int getX() const { return x; }
@@ -28,6 +27,12 @@ public:
     void moverDentroDelBioma(int newX, int newY);
     void moverAleatorio();
     void actualizarDireccionAleatoria();
+    void aumentarHambre();
+    void actualizarVelocidad();
+    int getHambre() const { return hambre; }
+    int getVelocidadActual() const { return velocidadActual; }
+    void huir();
+    bool estaSiendoPerseguida(const std::vector<Criatura*>& depredadores);
 
 
 private:
@@ -36,7 +41,6 @@ private:
     int x, y;
     bool vivo;
     int hambre;
-    int velocidad;
     int tipo; // Tipo de criatura
     std::thread hilo; // Hilo para el movimiento
     Bioma* bioma;
@@ -46,6 +50,14 @@ private:
     int direccionY;
     int tiempoDireccion;    //Tiempo que seguira la dirección actual
     const static int TIEMPO_CAMBIO_DIRECCION = 50; //5 segundos
+    int velocidadBase;
+    int velocidadActual;
+    std::chrono::steady_clock::time_point ultimaActualizacionHambre;
+    static const int HAMBRE_MAXIMA = 100;
+    static const int TIEMPO_HAMBRE_MAXIMA = 60; // 60 segundos
+    float centroBiomaX;
+    float centroBiomaY;
+    bool estaEnBordeBioma(int x, int y) const;
 };
 
 #endif // CRIATURA_H
